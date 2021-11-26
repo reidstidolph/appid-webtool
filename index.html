@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+      <v-app-bar elevation="4" rounded app>
+        <v-app-bar-title>Apps</v-app-bar-title>
+        <div>
+          <v-text-field
+          v-model="search"
+          hide-details
+          prepend-icon="mdi-magnify"
+          single-line
+          ></v-text-field>
+        </div>
+      </v-app-bar>
+
+      <v-dialog
+        v-model="appSelected"
+        width="400"
+      >
+        <v-card>
+          <v-toolbar dense dark>
+            <v-btn
+            icon
+            @click="resetSelectedApp()"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Application Details</v-toolbar-title>
+          </v-toolbar>
+          <br>
+          <v-card-text>
+              <h3>Name</h3>
+              {{selectedApp.name}}
+          </v-card-text>
+
+          <v-card-text>
+            <h3>Category</h3>
+            {{selectedApp.category}}
+          </v-card-text>
+
+          <v-card-text v-if="selectedApp.domains.length > 0">
+            <h3>Domains</h3>
+            <div v-for="domain in selectedApp.domains">
+              {{ domain }}
+            </div>
+          </v-card-text>
+
+          <v-card-text v-if="selectedApp.ports.length > 0">
+            <h3>Ports</h3>
+            <div v-for="port in selectedApp.ports">
+              {{ port.protocol }} {{ port.port_range.start }} <span v-if="port.port_range.end">- {{ port.port_range.end }}</span>
+            </div>
+          </v-card-text>
+
+          <v-card-text v-if="selectedApp.ipv4_prefixes.length > 0">
+            <h3>IPv4 Prefixes</h3>
+            <div v-for="prefix in selectedApp.ipv4_prefixes">
+              {{ prefix }}
+            </div>
+          </v-card-text>
+
+          <v-card-text v-if="selectedApp.ipv6_prefixes.length > 0">
+            <h3>IPv6 Prefixes</h3>
+            <div v-for="prefix in selectedApp.ipv6_prefixes">
+              {{ prefix }}
+            </div>
+          </v-card-text>
+
+        </v-card>
+      </v-dialog>
+
+      <v-main>
+
+        <v-container>
+          <div>
+            <v-data-table
+            :headers="headers"
+            :items="apps"
+            item-key="name"
+            :items-per-page="25"
+            :search="search"
+            :loading="loading"
+            loading-text="Loading... Please wait"
+            :footer-props="{
+              showFirstLastPage: true,
+              'items-per-page-text':'Applications per page',
+              'items-per-page-options': [10,25,50]
+            }"
+            >
+              <template v-slot:item="{ item }">
+                <tr @click="appSelect(item)">
+                  <td>{{item.name}}</td>
+                  <td>{{item.category}}</td>
+                </tr>
+              </template>
+
+            </v-data-table>
+          </div>
+
+        </v-container>
+      </v-main>
+    </v-app>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script>
+
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: {
+        "loading": true,
+        "search": '',
+        "headers": [
+          {
+            text: "Name",
+            value: "name"
+          },
+          {
+            text: "Category",
+            value: "category",
+            filterable: false
+          }
+        ],
+        "apps": [],
+        "selectedApp": {
+          name: "",
+          category: "",
+          domains: [],
+          ipv4_prefixes: [],
+          ipv6_prefixes: [],
+          ports: []
+        },
+        "appSelected": false
+      },
+      methods: {
+        fetchData(){
+          const appPromise = fetch('./application-classifications.json')
+          .then(response => {
+            console.log('got app data')
+            response.json().then(data => {
+              this.apps = Object.values(data)
+              this.loading = false
+            })
+          })
+        },
+        resetSelectedApp(){
+          this.appSelected = false
+          this.selectedApp ={
+            name: "",
+            category: "",
+            domains: [],
+            ipv4_prefixes: [],
+            ipv6_prefixes: [],
+            ports: []
+          } 
+        },
+        appSelect(app){
+          this.appSelected = true
+          this.selectedApp.name = app.name
+          this.selectedApp.category = app.category
+
+          if (app.domains && Array.isArray(app.domains)) {
+            this.selectedApp.domains = app.domains
+          }
+
+          if (app.ipv4_prefixes && Array.isArray(app.ipv4_prefixes)) {
+            this.selectedApp.ipv4_prefixes = app.ipv4_prefixes
+          }
+
+          if (app.ipv6_prefixes && Array.isArray(app.ipv6_prefixes)) {
+            this.selectedApp.ipv6_prefixes = app.ipv6_prefixes
+          }
+
+          if (app.ports && Array.isArray(app.ports)) {
+            this.selectedApp.ports = app.ports
+          }
+        }
+      },
+      created() {
+        this.fetchData();
+      }
+    })
+  </script>
+</body>
+</html>
