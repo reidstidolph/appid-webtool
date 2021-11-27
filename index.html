@@ -238,8 +238,8 @@ config authority service {{selectedApp.appKey}}.{{parentService}} address {{addr
 config authority service {{selectedApp.appKey}}.{{parentService}} address {{address}}</span>
 <span v-if="configDomains && selectedApp.domains.length > 0">
 config authority dns-app-id custom-apps {{selectedApp.appKey}} name {{selectedApp.appKey}}<span v-for="domain in selectedApp.domains">
-config authority dns-app-id custom-apps {{selectedApp.appKey}}  domain-name  *.{{domain}}
-config authority dns-app-id custom-apps {{selectedApp.appKey}}  domain-name  {{domain}}</span></span></span></pre>
+config authority dns-app-id custom-apps {{selectedApp.appKey}} domain-name  *.{{domain}}
+config authority dns-app-id custom-apps {{selectedApp.appKey}} domain-name  {{domain}}</span></span></span></pre>
                 </v-container>
               </v-card>
           </v-card-text>
