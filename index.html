@@ -3,6 +3,7 @@
 <head>
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
@@ -17,8 +18,13 @@
 <body>
   <div id="app">
     <v-app>
+
+      <!--
+      Top app bar
+      -->
       <v-app-bar elevation="4" app dark class="light-green">
-        <v-app-bar-title>Apps</v-app-bar-title>
+        <v-toolbar-title>Application Finder</v-toolbar-title>
+        <v-spacer></v-spacer>
         <div>
           <v-text-field
           v-model="search"
@@ -29,59 +35,212 @@
         </div>
       </v-app-bar>
 
+      <!--
+      App details dialog
+      -->
       <v-dialog
         v-model="appSelected"
         width="400"
       >
         <v-card>
+          <v-app-bar dense dark class="light-green">
+            <v-btn
+              icon
+              @click="resetSelectedApp()"
+            >
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-app-bar-title>Application Details</v-app-bar-title>
+          </v-app-bar>
+          <v-card>
+            <v-card-text>
+              <h3>Name</h3>
+              {{selectedApp.name}}
+            </v-card-text>
+
+            <v-card-text>
+              <h3>Category</h3>
+              {{selectedApp.category}}
+            </v-card-text>
+
+            <v-card-text v-if="selectedApp.domains.length > 0">
+              <h3>Domains</h3>
+              <div v-for="domain in selectedApp.domains">
+                {{ domain }}
+              </div>
+            </v-card-text>
+
+            <v-card-text v-if="selectedApp.ports.length > 0">
+              <h3>Ports</h3>
+              <div v-for="port in selectedApp.ports">
+                {{ port.protocol }} {{ port.port_range.start }} <span v-if="port.port_range.end">- {{ port.port_range.end }}</span>
+              </div>
+            </v-card-text>
+
+            <v-card-text v-if="selectedApp.ipv4_prefixes.length > 0">
+              <h3>IPv4 Prefixes</h3>
+              <div v-for="prefix in selectedApp.ipv4_prefixes">
+                {{ prefix }}
+              </div>
+            </v-card-text>
+
+            <v-card-text v-if="selectedApp.ipv6_prefixes.length > 0">
+              <h3>IPv6 Prefixes</h3>
+              <div v-for="prefix in selectedApp.ipv6_prefixes">
+                {{ prefix }}
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-card>
+      </v-dialog>
+
+      <!--
+      App config dialog
+      -->
+      <v-dialog
+        v-model="configSelected"
+        width="800"
+      >
+        <v-card>
           <v-toolbar dense dark class="light-green">
             <v-btn
             icon
-            @click="resetSelectedApp()"
+            @click="resetConfigApp()"
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Application Details</v-toolbar-title>
+          <v-toolbar-title>Application Config</v-toolbar-title>
           </v-toolbar>
           <br>
           <v-card-text>
-              <h3>Name</h3>
-              {{selectedApp.name}}
-          </v-card-text>
+            <v-alert
+              border="top"
+              colored-border
+              type="warning"
+              elevation="2"
+            >
+              Configuration generated as a suggestion based on application details. It may be incomplete, or may conflict with existing configuration. Always test configuration in a controlled environment to make sure it has the intended results.
+            </v-alert>
+            <v-container fluid>
+              <v-row>
+                <v-text-field
+                  v-model="parentService"
+                  label="Parent Service"
+                ></v-text-field>
+              </v-row>
+              <v-row>
 
-          <v-card-text>
-            <h3>Category</h3>
-            {{selectedApp.category}}
-          </v-card-text>
+                <v-col>
+                <v-switch
+                  v-model="flatConfig"
+                  label="Flat"
+                  dense
+                ></v-switch>
+                </v-col>
 
-          <v-card-text v-if="selectedApp.domains.length > 0">
-            <h3>Domains</h3>
-            <div v-for="domain in selectedApp.domains">
-              {{ domain }}
-            </div>
-          </v-card-text>
+                <v-col v-if="selectedApp.domains.length > 0">
+                <v-switch
+                  v-model="configDomains"
+                  label="Domains"
+                  dense
+                ></v-switch>
+                </v-col>
 
-          <v-card-text v-if="selectedApp.ports.length > 0">
-            <h3>Ports</h3>
-            <div v-for="port in selectedApp.ports">
-              {{ port.protocol }} {{ port.port_range.start }} <span v-if="port.port_range.end">- {{ port.port_range.end }}</span>
-            </div>
-          </v-card-text>
+                <v-col v-if="selectedApp.ipv6_prefixes.length > 0">
+                <v-switch
+                  v-model="configIpv6"
+                  label="Prefixes(v6)"
+                  dense
+                ></v-switch>
+                </v-col>
 
-          <v-card-text v-if="selectedApp.ipv4_prefixes.length > 0">
-            <h3>IPv4 Prefixes</h3>
-            <div v-for="prefix in selectedApp.ipv4_prefixes">
-              {{ prefix }}
-            </div>
-          </v-card-text>
+                <v-col v-if="selectedApp.ipv4_prefixes.length > 0">
+                <v-switch
+                  v-model="configIpv4"
+                  label="Prefixes(v4)"
+                  dense
+                ></v-switch>
+                </v-col>
 
-          <v-card-text v-if="selectedApp.ipv6_prefixes.length > 0">
-            <h3>IPv6 Prefixes</h3>
-            <div v-for="prefix in selectedApp.ipv6_prefixes">
-              {{ prefix }}
-            </div>
-          </v-card-text>
+                <v-col v-if="selectedApp.ports.length > 0">
+                <v-switch
+                  v-model="configPorts"
+                  label="Ports"
+                  dense
+                ></v-switch>
+                </v-col>
+              </v-row>
+              <br>
+            </v-container>
+              <v-card dark>
+                <v-snackbar v-model="textCopied" :timeout="timeout" top right><i class="material-icons">check_circle</i>Config copied to clipboard!</v-snackbar>
+                <v-btn fab right top class="light-green" absolute class="white--text" data-clipboard-action="copy" data-clipboard-target="#configText"><i class="material-icons">file_copy</i></v-btn>
+                <v-container style="overflow-x:auto; white-space: nowrap;">
+                  <pre id="configText">
+<span v-if="!flatConfig">config
+  authority
 
+    service             {{selectedApp.appKey}}.{{parentService}}
+      name              {{selectedApp.appKey}}.{{parentService}}
+      description       "{{selectedApp.name}}"<span v-if="configPorts" v-for="transport in selectedApp.ports"><span v-if="transport.protocol === 'tcp' || transport.protocol === 'udp'">
+      transport         {{transport.protocol}}
+        protocol        {{transport.protocol}}
+        port-range      {{transport.port_range.start}}
+          start-port    {{transport.port_range.start}}
+          end-port      <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
+        exit
+      exit</span><span v-if="transport.protocol === 'any'">
+      transport         tcp
+        protocol        tcp
+        port-range      {{transport.port_range.start}}
+          start-port    {{transport.port_range.start}}
+          end-port      <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
+        exit
+      exit
+      transport         udp
+        protocol        udp
+        port-range      {{transport.port_range.start}}
+          start-port    {{transport.port_range.start}}
+          end-port      <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
+        exit
+      exit</span></span><span v-if="configDomains && selectedApp.domains.length > 0">
+      application-name  {{selectedApp.appKey}}</span><span v-if="configDomains" v-for="domain in selectedApp.domains">
+      domain-name       *.{{domain}}
+      domain-name       {{domain}}</span><span v-if="configIpv4 && selectedApp.ipv4_prefixes.length > 0" v-for="address in selectedApp.ipv4_prefixes">
+      address           {{address}}</span><span v-if="configIpv6 && selectedApp.ipv6_prefixes.length > 0" v-for="address in selectedApp.ipv6_prefixes">
+      address           {{address}}</span>
+    exit
+    <span v-if="configDomains && selectedApp.domains.length > 0">
+    dns-app-id
+    custom-apps  {{selectedApp.appKey}}
+      name         {{selectedApp.appKey}}<span v-for="domain in selectedApp.domains">
+      domain-name       *.{{domain}}
+      domain-name       {{domain}}</span>
+    exit</span>
+  exit
+exit</span><span v-if="flatConfig">config authority service {{selectedApp.appKey}}.{{parentService}} name {{selectedApp.appKey}}.{{parentService}}
+config authority service {{selectedApp.appKey}}.{{parentService}} description "{{selectedApp.name}}"<span v-if="configPorts" v-for="transport in selectedApp.ports"><span v-if="transport.protocol === 'tcp' || transport.protocol === 'udp'">
+config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} protocol {{transport.protocol}}
+config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span><span v-if="transport.protocol === 'any'">
+config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp protocol tcp
+config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
+config authority service {{selectedApp.appKey}}.{{parentService}} transport udp protocol udp
+config authority service {{selectedApp.appKey}}.{{parentService}} transport udp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{selectedApp.appKey}}.{{parentService}} transport udp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span></span><span v-if="configDomains && selectedApp.domains.length > 0">
+config authority service {{selectedApp.appKey}}.{{parentService}} application-name {{selectedApp.appKey}}</span><span v-if="configDomains" v-for="domain in selectedApp.domains">
+config authority service {{selectedApp.appKey}}.{{parentService}} domain-name *.{{domain}}
+config authority service {{selectedApp.appKey}}.{{parentService}} domain-name {{domain}}</span><span v-if="configIpv4 && selectedApp.ipv4_prefixes.length > 0" v-for="address in selectedApp.ipv4_prefixes">
+config authority service {{selectedApp.appKey}}.{{parentService}} address {{address}}</span><span v-if="configIpv6 && selectedApp.ipv6_prefixes.length > 0" v-for="address in selectedApp.ipv6_prefixes">
+config authority service {{selectedApp.appKey}}.{{parentService}} address {{address}}</span>
+<span v-if="configDomains && selectedApp.domains.length > 0">
+config authority dns-app-id custom-apps {{selectedApp.appKey}} name {{selectedApp.appKey}}<span v-for="domain in selectedApp.domains">
+config authority dns-app-id custom-apps {{selectedApp.appKey}}  domain-name  *.{{domain}}
+config authority dns-app-id custom-apps {{selectedApp.appKey}}  domain-name  {{domain}}</span></span></span></pre>
+                </v-container>
+              </v-card>
+          </v-card-text>
         </v-card>
       </v-dialog>
 
@@ -105,9 +264,12 @@
             }"
             >
               <template v-slot:item="{ item }">
-                <tr @click="appSelect(item)">
+                <tr>
                   <td>{{item.name}}</td>
-                  <td>{{item.category}}</td>
+                  <td>
+                    <v-btn rounded small @click="appDetails(item)">Details</v-btn>
+                    <v-btn rounded small @click="appConfig(item)">Config</v-btn>
+                  </td>
                 </tr>
               </template>
 
@@ -121,6 +283,41 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script>
+
+    var clipboard = new ClipboardJS('.v-btn')
+
+    const model = {
+        "loading": true,
+        "search": '',
+        "headers": [
+          {
+            text: "Name",
+            value: "name"
+          },
+          {
+            text: ""
+          }
+        ],
+        "apps": [],
+        "selectedApp": {
+          name: "",
+          category: "",
+          domains: [],
+          ipv4_prefixes: [],
+          ipv6_prefixes: [],
+          ports: []
+        },
+        "parentService": "internet",
+        "flatConfig": false,
+        "configDomains": true,
+        "configPorts": false,
+        "configIpv4": false,
+        "configIpv6": false,
+        "appSelected": false,
+        "textCopied": false,
+        "timeout": 4000,
+        "configSelected": false
+      }
 
     new Vue({
       el: '#app',
@@ -141,37 +338,16 @@
           }
         }
       }),
-      data: {
-        "loading": true,
-        "search": '',
-        "headers": [
-          {
-            text: "Name",
-            value: "name"
-          },
-          {
-            text: "Category",
-            value: "category",
-            filterable: false
-          }
-        ],
-        "apps": [],
-        "selectedApp": {
-          name: "",
-          category: "",
-          domains: [],
-          ipv4_prefixes: [],
-          ipv6_prefixes: [],
-          ports: []
-        },
-        "appSelected": false
-      },
+      data: model,
       methods: {
         fetchData(){
           const appPromise = fetch('./application-classifications.json')
           .then(response => {
             console.log('got app data')
             response.json().then(data => {
+              Object.keys(data).forEach(appKey => {
+                data[appKey].appKey = appKey
+              })
               this.apps = Object.values(data)
               this.loading = false
             })
@@ -181,6 +357,7 @@
           this.appSelected = false
           this.selectedApp ={
             name: "",
+            appKey: "",
             category: "",
             domains: [],
             ipv4_prefixes: [],
@@ -188,10 +365,22 @@
             ports: []
           } 
         },
-        appSelect(app){
-          this.appSelected = true
+        resetConfigApp(){
+          this.configSelected = false
+          this.selectedApp ={
+            name: "",
+            appKey: "",
+            category: "",
+            domains: [],
+            ipv4_prefixes: [],
+            ipv6_prefixes: [],
+            ports: []
+          } 
+        },
+        selectApp(app){
           this.selectedApp.name = app.name
           this.selectedApp.category = app.category
+          this.selectedApp.appKey = app.appKey
 
           if (app.domains && Array.isArray(app.domains)) {
             this.selectedApp.domains = app.domains
@@ -208,11 +397,24 @@
           if (app.ports && Array.isArray(app.ports)) {
             this.selectedApp.ports = app.ports
           }
+        },
+        appDetails(app){
+          this.appSelected = true
+          this.selectApp(app)
+        },
+        appConfig(app){
+          this.configSelected = true
+          this.selectApp(app)
         }
       },
       created() {
         this.fetchData();
       }
+    })
+
+    clipboard.on('success', ()=> {
+      console.log('text copied.')
+      model.textCopied = true
     })
   </script>
 </body>
