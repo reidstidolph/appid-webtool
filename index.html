@@ -10,7 +10,7 @@
 <body>
   <div id="app">
     <v-app>
-      <v-app-bar elevation="4" rounded app>
+      <v-app-bar elevation="4" app dark>
         <v-app-bar-title>Apps</v-app-bar-title>
         <div>
           <v-text-field
@@ -90,6 +90,7 @@
             :search="search"
             :loading="loading"
             loading-text="Loading... Please wait"
+            mobile-breakpoint="0"
             :footer-props="{
               showFirstLastPage: true,
               'items-per-page-text':'Applications per page',
