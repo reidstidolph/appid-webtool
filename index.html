@@ -124,12 +124,21 @@
               Configuration generated as a suggestion based on application details. It may be incomplete, or may conflict with existing configuration. Always test configuration in a controlled environment to make sure it has the intended results.
             </v-alert>
             <v-container fluid>
+
+              <v-row>
+                <v-text-field
+                  v-model="serviceName"
+                  label="Service Name"
+                ></v-text-field>
+              </v-row>
+
               <v-row>
                 <v-text-field
                   v-model="parentService"
-                  label="Parent Service"
+                  label="Parent Service Name"
                 ></v-text-field>
               </v-row>
+
               <v-row>
 
                 <v-col>
@@ -182,8 +191,8 @@
 <span v-if="!flatConfig">config
   authority
 
-    service             {{selectedApp.appKey}}.{{parentService}}
-      name              {{selectedApp.appKey}}.{{parentService}}
+    service             {{serviceName}}.{{parentService}}
+      name              {{serviceName}}.{{parentService}}
       description       "{{selectedApp.name}}"<span v-if="configPorts" v-for="transport in selectedApp.ports"><span v-if="transport.protocol === 'tcp' || transport.protocol === 'udp'">
       transport         {{transport.protocol}}
         protocol        {{transport.protocol}}
@@ -220,22 +229,22 @@
       domain-name       {{domain}}</span>
     exit</span>
   exit
-exit</span><span v-if="flatConfig">config authority service {{selectedApp.appKey}}.{{parentService}} name {{selectedApp.appKey}}.{{parentService}}
-config authority service {{selectedApp.appKey}}.{{parentService}} description "{{selectedApp.name}}"<span v-if="configPorts" v-for="transport in selectedApp.ports"><span v-if="transport.protocol === 'tcp' || transport.protocol === 'udp'">
-config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} protocol {{transport.protocol}}
-config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
-config authority service {{selectedApp.appKey}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span><span v-if="transport.protocol === 'any'">
-config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp protocol tcp
-config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
-config authority service {{selectedApp.appKey}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
-config authority service {{selectedApp.appKey}}.{{parentService}} transport udp protocol udp
-config authority service {{selectedApp.appKey}}.{{parentService}} transport udp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
-config authority service {{selectedApp.appKey}}.{{parentService}} transport udp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span></span><span v-if="configDomains && selectedApp.domains.length > 0">
-config authority service {{selectedApp.appKey}}.{{parentService}} application-name {{selectedApp.appKey}}</span><span v-if="configDomains" v-for="domain in selectedApp.domains">
-config authority service {{selectedApp.appKey}}.{{parentService}} domain-name *.{{domain}}
-config authority service {{selectedApp.appKey}}.{{parentService}} domain-name {{domain}}</span><span v-if="configIpv4 && selectedApp.ipv4_prefixes.length > 0" v-for="address in selectedApp.ipv4_prefixes">
-config authority service {{selectedApp.appKey}}.{{parentService}} address {{address}}</span><span v-if="configIpv6 && selectedApp.ipv6_prefixes.length > 0" v-for="address in selectedApp.ipv6_prefixes">
-config authority service {{selectedApp.appKey}}.{{parentService}} address {{address}}</span>
+exit</span><span v-if="flatConfig">config authority service {{serviceName}}.{{parentService}} name {{serviceName}}.{{parentService}}
+config authority service {{serviceName}}.{{parentService}} description "{{selectedApp.name}}"<span v-if="configPorts" v-for="transport in selectedApp.ports"><span v-if="transport.protocol === 'tcp' || transport.protocol === 'udp'">
+config authority service {{serviceName}}.{{parentService}} transport {{transport.protocol}} protocol {{transport.protocol}}
+config authority service {{serviceName}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{serviceName}}.{{parentService}} transport {{transport.protocol}} port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span><span v-if="transport.protocol === 'any'">
+config authority service {{serviceName}}.{{parentService}} transport tcp protocol tcp
+config authority service {{serviceName}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{serviceName}}.{{parentService}} transport tcp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span>
+config authority service {{serviceName}}.{{parentService}} transport udp protocol udp
+config authority service {{serviceName}}.{{parentService}} transport udp port-range {{transport.port_range.start}} start-port {{transport.port_range.start}}
+config authority service {{serviceName}}.{{parentService}} transport udp port-range {{transport.port_range.start}} end-port <span v-if="transport.port_range.end">{{transport.port_range.end}}</span><span v-else>{{transport.port_range.start}}</span></span></span><span v-if="configDomains && selectedApp.domains.length > 0">
+config authority service {{serviceName}}.{{parentService}} application-name {{selectedApp.appKey}}</span><span v-if="configDomains" v-for="domain in selectedApp.domains">
+config authority service {{serviceName}}.{{parentService}} domain-name *.{{domain}}
+config authority service {{serviceName}}.{{parentService}} domain-name {{domain}}</span><span v-if="configIpv4 && selectedApp.ipv4_prefixes.length > 0" v-for="address in selectedApp.ipv4_prefixes">
+config authority service {{serviceName}}.{{parentService}} address {{address}}</span><span v-if="configIpv6 && selectedApp.ipv6_prefixes.length > 0" v-for="address in selectedApp.ipv6_prefixes">
+config authority service {{serviceName}}.{{parentService}} address {{address}}</span>
 <span v-if="configDomains && selectedApp.domains.length > 0">
 config authority dns-app-id custom-apps {{selectedApp.appKey}} name {{selectedApp.appKey}}<span v-for="domain in selectedApp.domains">
 config authority dns-app-id custom-apps {{selectedApp.appKey}} domain-name  *.{{domain}}
@@ -313,6 +322,7 @@ config authority dns-app-id custom-apps {{selectedApp.appKey}} domain-name  {{do
           ports: []
         },
         "parentService": "internet",
+        "serviceName": "",
         "flatConfig": false,
         "configDomains": true,
         "configPorts": false,
@@ -386,6 +396,7 @@ config authority dns-app-id custom-apps {{selectedApp.appKey}} domain-name  {{do
           this.selectedApp.name = app.name
           this.selectedApp.category = app.category
           this.selectedApp.appKey = app.appKey
+          this.serviceName = app.appKey
 
           if (app.domains && Array.isArray(app.domains)) {
             this.selectedApp.domains = app.domains
