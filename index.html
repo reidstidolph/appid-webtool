@@ -75,7 +75,9 @@
             <v-card-text v-if="selectedApp.ports.length > 0">
               <h3>Ports</h3>
               <div v-for="port in selectedApp.ports">
-                {{ port.protocol }} {{ port.port_range.start }} <span v-if="port.port_range.end">- {{ port.port_range.end }}</span>
+                <div v-for="portRange in port.port_range">
+                  {{ port.protocol }} {{ portRange.start }} <span v-if="portRange.end">- {{ portRange.end }}</span>
+                </div>
               </div>
             </v-card-text>
 
